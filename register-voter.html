@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><title>Register Voter</title><link rel="stylesheet" href="css/style.css"></head>
+<body><header><h1>REGISTER VOTER ID</h1></header>
+<form id="form">
+<fieldset><legend>Family</legend>
+<input name="full_name" placeholder="Full Name" required>
+<input name="father_name" placeholder="Father Name" required>
+<input name="mother_name" placeholder="Mother Name" required>
+<input name="grandfather_name" placeholder="Grandfather Name">
+</fieldset>
+<fieldset><legend>Location</legend>
+<input name="province" placeholder="Province" required>
+<input name="district" placeholder="District" required>
+<input name="municipality" placeholder="Municipality" required>
+<input name="tole" placeholder="Tole">
+</fieldset>
+<fieldset><legend>Documents</legend>
+<input name="citizenship_no" placeholder="Citizenship No" required>
+<input type="date" name="citizenship_issue_date" required>
+<input type="date" name="birth_date" required>
+</fieldset>
+<button type="submit">Submit → Get Voter ID</button>
+</form>
+<div id="result"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/main.js"></script>
+<script>
+const eid = getElectionId();
+document.getElementById('form').onsubmit = async e => {
+  e.preventDefault();
+  const d = Object.fromEntries(new FormData(e.target));
+  d.election_id = eid;
+  d.voter_id = await generateVoterId();
+  d.approved = false;
+  const { error } = await supabase.from('voters').insert(d);
+  document.getElementById('result').innerHTML = error 
+    ? `<p class="error">${error.message}</p>`
+    : `<div class="success">SUCCESS! Voter ID: <b>${d.voter_id}</b><br>Wait for admin approval!</div>`;
+};
+</script>
+</body></html>
