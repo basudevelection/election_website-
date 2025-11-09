@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><title>Dashboard</title><link rel="stylesheet" href="css/style.css"></head>
+<body><header><h1>ELECTION DASHBOARD</h1></header>
+<div class="nav-box">
+  <button onclick="location.href='register-voter.html?id='+getElectionId()">Register Voter ID</button>
+  <button onclick="location.href='eligibility.html?id='+getElectionId()">Eligibility Check</button>
+  <button onclick="location.href='register-candidate.html?id='+getElectionId()">Register as Candidate</button>
+  <button onclick="location.href='know-candidates.html?id='+getElectionId()">Know Candidates</button>
+  <button onclick="location.href='vote.html?id='+getElectionId()">Proceed to Vote</button>
+  <button onclick="location.href='results.html?id='+getElectionId()">Results</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/main.js"></script>
+<script>function getElectionId(){return new URLSearchParams(window.location.search).get('id');}</script>
+</body></html>
