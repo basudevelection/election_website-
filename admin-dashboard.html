@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><title>Admin Panel</title><link rel="stylesheet" href="css/style.css"></head>
+<body><header><h1>ADMIN PANEL</h1></header>
+<button onclick="localStorage.removeItem('admin');location.href='admin-login.html'">Logout</button>
+<h2>Add Election</h2>
+<input type="text" id="name" placeholder="Election Name">
+<input type="datetime-local" id="start">
+<input type="datetime-local" id="end">
+<button onclick="addElection()">Create</button>
+
+<h2>Pending Voters</h2><div id="voters"></div>
+<h2>Pending Candidates</h2><div id="candidates"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/main.js"></script>
+<script>
+if(!localStorage.getItem('admin')) location.href='admin-login.html';
+async function addElection() {
+  const s = document.getElementById('start').value;
+  const close = new Date(new Date(s) - 24*60*60*1000).toISOString();
+  await supabase.from('elections').insert({
+    name: document.getElementById('name').value,
+    start_date: s,
+    end_date: document.getElementById('end').value,
+    candidate_close_date: close
+  });
+  alert('Election Created!');
+}
+async function loadPending() {
+  const { data: v } = await supabase.from('voters').select('*').eq('approved',false);
+  document.getElementById('voters').innerHTML = v.map(x=>`
+    <div class="card">${x.full_name} - ${x.voter_id}
+    <button onclick="approve('${x.id}','voters')">Approve</button></div>
+  `).join('');
+}
+async function approve(id, table) {
+  await supabase.from(table).update({approved:true}).eq('id',id);
+  loadPending();
+}
+setInterval(loadPending, 3000);
+loadPending();
+</script>
+</body></html>
