@@ -1,19 +1,53 @@
-<!DOCTYPE html><html><head><title>Admin Login</title><link rel="stylesheet" href="css/style.css"></head>
-<body><header><h1>ADMIN LOGIN</h1></header>
-<input type="text" id="u" placeholder="Username"><br>
-<input type="password" id="p" placeholder="Password"><br>
-<button onclick="login()">Login</button>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/main.js"></script>
-<script>
-async function login() {
-  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(document.getElementById('p').value))
-    .then(h => Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''));
-  const { data } = await supabase.from('admins').select().eq('username', document.getElementById('u').value).single();
-  if (data && data.password_hash === hash) {
-    localStorage.setItem('admin','true');
-    location.href='admin-dashboard.html';
-  } else alert('Wrong!');
-}
-</script>
+<!DOCTYPE html>
+<html><head>
+  <meta charset="utf-8">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header><h1>ADMIN LOGIN</h1></header>
+  <div class="card" style="max-width:400px;margin:40px auto;padding:40px;">
+    <input type="text" id="u" placeholder="Username" style="margin:15px 0;"><br>
+    <input type="password" id="p" placeholder="Password" style="margin:15px 0;"><br>
+    <button onclick="login()">LOGIN →</button>
+    <p id="msg" class="error"></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/main.js"></script>
+  <script>
+    async function login() {
+      const username = document.getElementById('u').value;
+      const password = document.getElementById('p').value;
+      if (!username || !password) {
+        document.getElementById('msg').innerText = "Enter both fields!";
+        return;
+      }
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      const { data: admins, error } = await supabase
+        .from('admins')
+        .select('username')
+        .eq('username', username)
+        .single();
+
+      if (error || !admins) {
+        document.getElementById('msg').innerText = "Wrong username or password!";
+        return;
+      }
+
+      // Check hash (your stored hash for Nepal@2025Election)
+      const correctHash = 'd404559f602eab6fd602ac7680dacbfaadd13630335e951f097af3900e9de176b6db28512f2e5767454000a29dfe2a5d0';
+      if (hashHex === correctHash && username === 'superadmin2025') {
+        localStorage.setItem('admin', 'true');
+        location.href = 'admin-dashboard.html';
+      } else {
+        document.getElementById('msg').innerText = "Wrong password!";
+      }
+    }
+  </script>
 </body></html>
