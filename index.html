@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Election Nepal</title>
+<link rel="stylesheet" href="css/style.css"></head>
+<body>
+<header><h1>ELECTION LIST</h1></header>
+<div class="election-grid" id="elections">Loading...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/main.js"></script>
+<script>
+async function load() {
+  const { data } = await supabase.from('elections').select('*');
+  document.getElementById('elections').innerHTML = data.length ? data.map(e => `
+    <div class="card"><h2>${e.name}</h2>
+    <p>${new Date(e.start_date).toLocaleString('en-NP')}</p>
+    <button onclick="location.href='election.html?id=${e.id}'">Enter →</button></div>
+  `).join('') : '<p class="success">Admin: Create first election!</p>';
+}
+load();
+</script>
+</body></html>
